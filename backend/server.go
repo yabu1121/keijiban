@@ -1,6 +1,9 @@
 package main
 
+// 必要なライブラリを導入
 import (
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/yabu1121/blog-backend/database"
@@ -8,9 +11,18 @@ import (
 	authmiddleware "github.com/yabu1121/blog-backend/middleware"
 )
 
+
 func main() {
 
+	// echoを.New()で
+	// *echo Echo型のポインタを返すのでその変数、eで保存する
 	e := echo.New()
+
+	// eはpackage middleware内で宣言したRequestLoggerとCORSWithConfig(middleware.CORSConfig)で
+	// CORSConfigで
+	// rootのurlをlocalhost:3000
+	// headerを,,,,
+	//Credentialsは認証機能を使うようにしている。
 	e.Use(middleware.RequestLogger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -18,8 +30,13 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	database.InitDB()
+	// package databaseにあるInitDB関数を利用する。
+	if err := database.InitDB(); err != nil {
+    e.Logger.Fatal("サーバーを起動できませんでした: ", err)
+}
 
+	// それぞれのhandlerとしてそれぞれのファイルのhandlerを呼べるようにする。また、これはdbをcontextに持つのでdbを渡す
+	// (ポインタ参照の理由は同一のデータを共有するため、(h *UserHandlerなどにしているから))
 	userHandler := &handler.UserHandler{DB: database.DB}
 	postHandler := &handler.PostHandler{DB: database.DB}
 	commentHandler := &handler.CommentHandler{DB: database.DB}
@@ -35,6 +52,7 @@ func main() {
 	e.GET("/post/:id/comments", commentHandler.GetComments)
 
 	// 認証が必要なルート（書き込み系）
+	// e.groupによってrouterの共通部分を記述したりミドルウェアをとういつさせることができる。
 	authGroup := e.Group("")
 	authGroup.Use(authmiddleware.JWTAuth)
 	authGroup.POST("/user", userHandler.CreateUser)
@@ -44,7 +62,7 @@ func main() {
 	authGroup.POST("/post/:id/comment", commentHandler.CreateComment)
 	authGroup.GET("/me", userHandler.GetMe)
 
-	if err := e.Start(":8080"); err != nil {
+	if err := e.Start(os.Getenv("BACKEND_PORT")); err != nil {
 		e.Logger.Error("failed to start server", "error", err)
 	}
 }
