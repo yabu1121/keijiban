@@ -19,18 +19,26 @@ type UserHandler struct{
 
 // すべてのuserを取得する
 func (h *UserHandler) GetAllUser(c echo.Context) error {
+	// usersという変数にuserのモデルの配列の方を宣言する
 	var users []models.User
-	if err := h.DB.Find(&users).Error; err != nil {
+	// h.DBというのはUserhandlerにDBというフィールドを持たせることで、データベースにアクセスできるようになる。DIという。
+	// これはほんとうはselectでもうすでに制限したほうが守備範囲がよくなる。
+	// usersというポインタにfindしたものを入れ込む。
+	// dbのErrorはこの記述で行えるから、err に代入されている場合は、jsonを返す。
+	if err := h.DB.Select("id", "name").Find(&users).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "internal server error"})
 	}
 
+	// resという変数に、長さusersの要素数と同じの、getUsersResponseのスライスを作成する。
 	res := make([]models.GetUserResponse, len(users))
 	for i, u := range users {
+		// usersの長さ分繰り返して、resにusersの表示内容を詰め替えている。
 		res[i] = models.GetUserResponse{
 			ID:   u.ID,
 			Name: u.Name,
 		}
 	}
+	// すべてうまくいったらresをjsonで返す
 	return c.JSON(http.StatusOK, res)
 }
 
