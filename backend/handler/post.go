@@ -12,6 +12,7 @@ type PostHandler struct {
 	DB *gorm.DB
 }
 
+// postを作成する関数
 func (h *PostHandler) CreatePost(c echo.Context) error {
 	// JWTミドルウェアがセットしたuser_idを取得
 	userID, ok := c.Get("user_id").(uint)
@@ -49,6 +50,7 @@ func (h *PostHandler) CreatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
+// すべてのpostを取得する関数
 func (h *PostHandler) GetAllPost (c echo.Context) error {
 	var posts []models.Post
 	if err := h.DB.Preload("User").Find(&posts).Error; err != nil {
@@ -71,6 +73,7 @@ func (h *PostHandler) GetAllPost (c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// 指定したidとpostのidが一致するものを取得する
 func (h *PostHandler) GetPostById (c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -95,6 +98,7 @@ func (h *PostHandler) GetPostById (c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// 指定したidとpostのidが一致するものを削除する
 func (h * PostHandler) DeletePost (c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {
@@ -106,6 +110,7 @@ func (h * PostHandler) DeletePost (c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// 指定したidとpostのidが一致した場合postを与えられたcontextに更新する
 func (h *PostHandler) UpdatePost (c echo.Context) error {
 	id := c.Param("id")
 	if id == "" {

@@ -12,10 +12,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserHandlerとしてserverでインポートするので作成しておく
 type UserHandler struct{
 	DB *gorm.DB
 }
 
+// すべてのuserを取得する
 func (h *UserHandler) GetAllUser(c echo.Context) error {
 	var users []models.User
 	if err := h.DB.Find(&users).Error; err != nil {
@@ -32,6 +34,7 @@ func (h *UserHandler) GetAllUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// 指定したidとuserのidが一致するものを取得する
 func (h *UserHandler) GetUserById(c echo.Context) error {
 	id := c.Param("id")
 	var user models.User
@@ -45,6 +48,7 @@ func (h *UserHandler) GetUserById(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+//　userを作成する。
 func (h *UserHandler) CreateUser(c echo.Context) error {
 	req := models.CreateUserRequest{}
 	if err := c.Bind(&req); err != nil {
@@ -67,6 +71,7 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
+// signupする関数
 func (h *UserHandler) SignUp(c echo.Context) error {
 	var req models.SignUpUserRequest
 	if err := c.Bind(&req); err != nil {
@@ -99,6 +104,7 @@ func (h *UserHandler) SignUp(c echo.Context) error {
 	return c.JSON(http.StatusCreated, models.JwtResponse{Token: t})
 }
 
+// loginする関数
 func (h *UserHandler) Login (c echo.Context) error {
 	var req models.LoginUserRequest
 	if err := c.Bind(&req); err != nil {
@@ -126,7 +132,7 @@ func (h *UserHandler) Login (c echo.Context) error {
 	return c.JSON(http.StatusOK, models.JwtResponse{Token: t})
 }
 
-
+// userの情報を取得する関数。
 func (h *UserHandler) GetMe (c echo.Context) error {
 	val := c.Get("user_id")
 	userID, ok := val.(uint)

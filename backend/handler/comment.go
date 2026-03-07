@@ -13,6 +13,7 @@ type CommentHandler struct {
 	DB *gorm.DB
 }
 
+// commentを取得する関数
 func (h *CommentHandler) GetComments(c echo.Context) error {
 	post_id := c.Param("id")
 	if post_id == "" {
@@ -40,6 +41,7 @@ func (h *CommentHandler) GetComments(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// commentを作成する関数
 func (h *CommentHandler) CreateComment(c echo.Context) error {
 	postID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
