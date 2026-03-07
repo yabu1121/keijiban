@@ -3,6 +3,7 @@ import { CommentList } from "@/components/CommentList";
 import { CommentPostButton } from "@/components/CommentPostButton";
 import { Post } from "@/types/post";
 import Link from "next/link";
+import { ArrowLeft, MessageSquare, Clock } from "lucide-react";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -12,31 +13,50 @@ const page = async ({ params }: Props) => {
   const { id } = await params;
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/post/${id}`)
   const post: Post = await res.json()
+
   return (
-    <>
-      <div>
-        <h1 className="font-bold text-2xl">{post.title}</h1>
-        <hr />
-        <p className="text-sm my-4">{post.content}</p>
+    <div className="fade-in">
+      {/* 戻るリンク */}
+      <Link href="/post" style={{
+        display: "inline-flex", alignItems: "center", gap: "6px",
+        color: "var(--text-muted)", fontSize: "13px", textDecoration: "none",
+        marginBottom: "24px",
+        transition: "color 0.15s ease",
+      }}
+        className="nav-back"
+      >
+        <ArrowLeft size={14} />
+        投稿一覧に戻る
+      </Link>
+
+      {/* 記事本文 */}
+      <div className="card" style={{ marginBottom: "32px" }}>
+        <h1 style={{ fontSize: "26px", fontWeight: 800, color: "var(--text-primary)", marginBottom: "16px", lineHeight: 1.3 }}>
+          {post.title}
+        </h1>
+        <hr className="divider" />
+        <p style={{ fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.8 }}>
+          {post.content}
+        </p>
       </div>
 
-      <div className="my-4">
-        <div className="flex justify-between">
-          <h2 className="font-bold text-xl">コメント一覧</h2>
+      {/* コメントセクション */}
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <MessageSquare size={18} color="var(--accent)" />
+            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)" }}>コメント</h2>
+          </div>
           <CommentPostButton id={Number(id)} />
         </div>
-        <hr className="mb-4" />
-        <div className="max-w-4xl mx-auto space-y-4">
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <CommentList postId={Number(id)} />
         </div>
       </div>
 
-      <div className="mx-auto w-fit">
-        <Link className="bg-blue-500 rounded-full text-white w-30 h-10 flex items-center justify-center" href="/post">スレッドに戻る</Link>
-      </div>
-
       <CommentCreateModal />
-    </>
+    </div>
   )
 }
 

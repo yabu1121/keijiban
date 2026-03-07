@@ -1,7 +1,6 @@
 'use client'
 import { useCommentCreateModalStore } from '@/store/useModalstore'
-import { Pen } from 'lucide-react'
-
+import { MessageSquarePlus } from 'lucide-react'
 
 export const CommentPostButton = ({ id }: { id: number }) => {
   const { openModal } = useCommentCreateModalStore();
@@ -10,8 +9,9 @@ export const CommentPostButton = ({ id }: { id: number }) => {
     openModal(id);
   }
   return (
-    <div>
-      <Pen className='text-blue-300 hover:text-blue-400 cursor-pointer ' onClick={handlePost} />
-    </div>
+    <button className="btn-primary" onClick={handlePost} style={{ fontSize: "13px", padding: "8px 14px" }}>
+      <MessageSquarePlus size={15} />
+      コメントを投稿
+    </button>
   )
 }

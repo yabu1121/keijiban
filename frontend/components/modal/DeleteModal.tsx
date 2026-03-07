@@ -2,19 +2,19 @@
 import { deletePosts } from "@/actions/postApi";
 import { usePostDeleteModalStore } from "@/store/useModalstore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export const DeleteModal = () => {
   const queryClient = useQueryClient();
   const { modalId, closeModal } = usePostDeleteModalStore();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (targetId: number) => deletePosts(targetId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
       closeModal()
-      toast.success('削除完了')
+      toast.success('削除しました')
     }
   })
 
@@ -33,24 +33,52 @@ export const DeleteModal = () => {
   }
 
   return (
-    <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200 z-50'>
-      <div className='relative bg-white rounded-2xl shadow-2xl p-8 w-80 animate-in fade-in zoom-in-95 duration-300'>
+    <div className="modal-overlay" onClick={handleClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        {/* 閉じるボタン */}
         <button
           onClick={handleClose}
-          className='absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400 hover:border-red-200 transition-all duration-150 cursor-pointer'
+          style={{
+            position: "absolute", top: "16px", right: "16px",
+            width: "32px", height: "32px",
+            background: "var(--bg-hover)", border: "1px solid var(--border)",
+            borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "var(--text-muted)", transition: "all 0.15s ease",
+          }}
         >
-          <X className='w-4 h-4' />
+          <X size={16} />
         </button>
-        <div className='mb-6'>
-          <p className='text-lg font-bold text-gray-900 mb-2'>本当に削除しますか？</p>
-          <p className='text-sm text-gray-500 leading-relaxed'>この操作は元に戻すことができません。</p>
+
+        {/* アイコン */}
+        <div style={{
+          width: "52px", height: "52px",
+          background: "rgba(224, 82, 82, 0.12)",
+          borderRadius: "12px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          marginBottom: "20px",
+        }}>
+          <AlertTriangle size={26} color="var(--danger)" />
         </div>
-        <div className='flex gap-3'>
-          <button onClick={handleClose} className='flex-1 h-11 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all duration-150 cursor-pointer'>
-            戻る
+
+        <p style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>
+          本当に削除しますか？
+        </p>
+        <p style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "28px" }}>
+          この操作は元に戻すことができません。削除した投稿は復元できません。
+        </p>
+
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button onClick={handleClose} className="btn-ghost" style={{ flex: 1, justifyContent: "center" }}>
+            キャンセル
           </button>
-          <button onClick={handleDelete} className='flex-1 h-11 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-all duration-150 cursor-pointer shadow-lg shadow-red-200'>
-            削除する
+          <button
+            onClick={handleDelete}
+            className="btn-danger"
+            disabled={isPending}
+            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", padding: "10px" }}
+          >
+            <Trash2 size={14} />
+            {isPending ? "削除中..." : "削除する"}
           </button>
         </div>
       </div>

@@ -4,7 +4,14 @@ import { LogOut } from "lucide-react"
 
 const LogoutButton = () => {
   return (
-    <LogOut onClick={Logout} className='block text-blue-500 hover:text-blue-500/80 cursor-pointer text-xl'/>
+    <button
+      onClick={Logout}
+      className="btn-ghost"
+      style={{ width: "100%", display: "flex", alignItems: "center", gap: "8px" }}
+    >
+      <LogOut size={15} />
+      ログアウト
+    </button>
   )
 }
 

@@ -1,12 +1,36 @@
 import { SignUpForm } from "@/components/SignUpForm"
 import Link from "next/link"
+import { UserPlus } from "lucide-react"
 
 const SignUpPage = () => {
   return (
-    <div>
-      <h1 className='font-bold text-2xl my-4'>ユーザー登録</h1>
-      <SignUpForm />
-      <Link href="/login" className="underline text-blue-500 cursor-pointer hover:text-blue-500/80">登録済みの方はこちら</Link>
+    <div className="fade-in" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "70vh" }}>
+      <div className="card" style={{ width: "100%", maxWidth: "420px" }}>
+        {/* ヘッダー */}
+        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <div style={{
+            width: "48px", height: "48px",
+            background: "var(--accent-muted)",
+            borderRadius: "12px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            margin: "0 auto 16px",
+          }}>
+            <UserPlus size={22} color="var(--accent)" />
+          </div>
+          <h1 style={{ fontSize: "22px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "6px" }}>ユーザー登録</h1>
+          <p style={{ color: "var(--text-muted)", fontSize: "13px" }}>新しいアカウントを作成します</p>
+        </div>
+
+        <SignUpForm />
+
+        <hr className="divider" />
+        <p style={{ textAlign: "center", fontSize: "13px", color: "var(--text-muted)" }}>
+          すでにアカウントをお持ちの方は{" "}
+          <Link href="/login" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
+            こちらでログイン
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

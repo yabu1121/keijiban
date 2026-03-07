@@ -3,21 +3,21 @@ import { createComment } from "@/actions/commentApi";
 import { useCommentCreateModalStore } from "@/store/useModalstore";
 import { CreateCommentRequest } from "@/types/comment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, MessageSquarePlus, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export const CommentCreateModal = () => {
   const queryClient = useQueryClient();
   const { modalId, closeModal } = useCommentCreateModalStore();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: ({ targetId, targetPost }: {
       targetId: number,
       targetPost: CreateCommentRequest
     }) => createComment({ postId: targetId, req: targetPost }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['comments'] });
-      toast.success('投稿完了')
+      toast.success('コメントを投稿しました！')
       closeModal()
     }
   })
@@ -28,13 +28,11 @@ export const CommentCreateModal = () => {
     e.preventDefault();
     const form = e.currentTarget
     const formData = new FormData(e.currentTarget);
-
     const req: CreateCommentRequest = {
       title: String(formData.get('title') ?? ""),
       content: String(formData.get('content') ?? ""),
       postId: modalId,
     };
-
     mutate({ targetId: modalId, targetPost: req }, {
       onSuccess: () => form.reset()
     })
@@ -47,29 +45,78 @@ export const CommentCreateModal = () => {
   }
 
   return (
-    <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200 z-50'>
-      <div className='relative bg-white rounded-2xl shadow-2xl p-8 w-80 animate-in fade-in zoom-in-95 duration-300'>
+    <div className="modal-overlay">
+      <div className="modal-box">
+        {/* 閉じるボタン */}
         <button
           onClick={handleClose}
-          className='absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400 hover:border-red-200 transition-all duration-150 cursor-pointer'
+          style={{
+            position: "absolute", top: "16px", right: "16px",
+            width: "32px", height: "32px",
+            background: "var(--bg-hover)", border: "1px solid var(--border)",
+            borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "var(--text-muted)", transition: "all 0.15s ease",
+          }}
         >
-          <X className='w-4 h-4' />
+          <X size={16} />
         </button>
-        <div className='mb-6'>
-          <p className='text-lg font-bold text-gray-900 mb-2'>コメントを投稿</p>
-          <form onSubmit={handleSubmit} id="post-form" className="flex flex-col gap-2 mt-4">
-            <input name="title" type="text" className="border p-1" placeholder="title" />
-            <input name="content" type="text" className="border p-1" placeholder="content" />
-          </form>
+
+        {/* ヘッダー */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
+          <div style={{
+            width: "40px", height: "40px",
+            background: "var(--accent-muted)",
+            borderRadius: "10px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <MessageSquarePlus size={20} color="var(--accent)" />
+          </div>
+          <p style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)" }}>
+            コメントを投稿
+          </p>
         </div>
-        <div className='flex gap-3'>
-          <button type="submit" form="post-form" className='flex-1 h-11 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all duration-150 cursor-pointer'>
-            投稿する
-          </button>
-          <button onClick={handleClose} className='flex-1 h-11 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-all duration-150 cursor-pointer shadow-lg shadow-red-200'>
-            閉じる
-          </button>
-        </div>
+
+        <form onSubmit={handleSubmit} id="post-form" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div className="form-group">
+            <label className="label" htmlFor="comment-title">件名</label>
+            <input
+              id="comment-title"
+              name="title"
+              type="text"
+              className="input"
+              placeholder="コメントの件名..."
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="label" htmlFor="comment-content">内容</label>
+            <textarea
+              id="comment-content"
+              name="content"
+              className="input"
+              placeholder="コメント内容を入力..."
+              rows={4}
+              style={{ resize: "vertical", fontFamily: "inherit" }}
+              required
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+            <button type="button" onClick={handleClose} className="btn-ghost" style={{ flex: 1, justifyContent: "center" }}>
+              キャンセル
+            </button>
+            <button
+              type="submit"
+              form="post-form"
+              className="btn-primary"
+              disabled={isPending}
+              style={{ flex: 1, justifyContent: "center", opacity: isPending ? 0.7 : 1 }}
+            >
+              <Send size={14} />
+              {isPending ? "投稿中..." : "投稿する"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )

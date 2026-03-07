@@ -1,1 +1,312 @@
 @import "tailwindcss";
+
+:root {
+  /* === カラーパレット ===
+     メイン : #1A365D (ネイビー)
+     サブ   : #F7FAFC (ライトグレー)
+     アクセント: #D69E2E (ゴールド)
+  */
+
+  /* 背景 */
+  --bg-base: #EDF2F7;
+  --bg-surface: #F7FAFC;
+  --bg-card: #FFFFFF;
+  --bg-hover: #E2E8F0;
+
+  /* ボーダー */
+  --border: #CBD5E0;
+  --border-light: #A0AEC0;
+
+  /* メインカラー（ネイビー系） */
+  --main: #1A365D;
+  --main-dark: #112448;
+  --main-light: #2A4A7F;
+  --main-muted: rgba(26, 54, 93, 0.08);
+
+  /* アクセントカラー（ゴールド系） */
+  --accent: #D69E2E;
+  --accent-hover: #B7791F;
+  --accent-muted: rgba(214, 158, 46, 0.12);
+  --accent-light: #FAF089;
+
+  /* テキスト */
+  --text-primary: #1A202C;
+  --text-secondary: #4A5568;
+  --text-muted: #718096;
+  --text-inverse: #F7FAFC;
+
+  /* ステータス */
+  --danger: #C53030;
+  --danger-hover: #9B2C2C;
+  --danger-muted: rgba(197, 48, 48, 0.1);
+  --success: #276749;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-base);
+  min-height: 100vh;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--main-light);
+}
+
+/* ===== 共通コンポーネント ===== */
+
+/* カード */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.card:hover {
+  border-color: var(--border-light);
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.08);
+}
+
+/* プライマリボタン（ゴールド） */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(214, 158, 46, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* デンジャーボタン */
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ゴーストボタン */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-ghost:hover {
+  color: var(--main);
+  border-color: var(--main-light);
+  background: var(--main-muted);
+}
+
+/* インプット */
+.input {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+/* ラベル */
+.label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* ナビリンク（サイドバー用） */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: rgba(247, 250, 252, 0.7);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* セクションタイトル */
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--main);
+  margin-bottom: 16px;
+}
+
+/* セクションサブ */
+.section-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* 区切り線 */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+/* フォームグループ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* バッジ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--accent-muted);
+  color: var(--accent-hover);
+  border: 1px solid rgba(214, 158, 46, 0.2);
+}
+
+/* ===== アニメーション ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* ===== モーダル ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 54, 93, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: calc(100vw - 40px);
+  box-shadow: 0 24px 64px rgba(26, 54, 93, 0.2);
+  position: relative;
+}

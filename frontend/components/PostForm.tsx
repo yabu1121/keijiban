@@ -2,19 +2,20 @@
 import { createPost } from "@/actions/postApi";
 import { CreatePostRequest } from "@/types/post";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2Icon } from "lucide-react";
+import { Loader2, Send, Type, AlignLeft } from "lucide-react";
 import { toast } from "sonner";
-
-
 
 export default function PostForm() {
   const queryClient = useQueryClient();
 
-  const { mutate, isPending, isError } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (targetPost: CreatePostRequest) => createPost(targetPost),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      toast.success('投稿完了')
+      toast.success('投稿が完了しました！')
+    },
+    onError: () => {
+      toast.error('投稿に失敗しました')
     }
   })
 
@@ -22,24 +23,66 @@ export default function PostForm() {
     e.preventDefault();
     const form = e.currentTarget
     const formData = new FormData(e.currentTarget);
-
     const req = {
       title: String(formData.get('title') ?? ""),
       content: String(formData.get('content') ?? ""),
     };
-
     mutate(req, {
       onSuccess: () => form.reset()
     })
   };
 
-  if (isError) (<p>error...</p>)
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-4">
-      <input name="title" type="text" className="border p-1" placeholder="title" />
-      <input name="content" type="text" className="border p-1" placeholder="content" />
-      <button type="submit" className="bg-blue-500 text-white p-1">{isPending ? "投稿中" : "投稿"}</button>
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div className="form-group">
+        <label className="label" htmlFor="post-title">
+          <Type size={12} style={{ display: "inline", marginRight: "4px" }} />
+          タイトル
+        </label>
+        <input
+          id="post-title"
+          name="title"
+          type="text"
+          className="input"
+          placeholder="投稿のタイトルを入力..."
+          required
+        />
+      </div>
+      <div className="form-group">
+        <label className="label" htmlFor="post-content">
+          <AlignLeft size={12} style={{ display: "inline", marginRight: "4px" }} />
+          本文
+        </label>
+        <textarea
+          id="post-content"
+          name="content"
+          className="input"
+          placeholder="内容を入力..."
+          rows={4}
+          style={{ resize: "vertical", fontFamily: "inherit" }}
+          required
+        />
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button
+          type="submit"
+          className="btn-primary"
+          disabled={isPending}
+          style={{ opacity: isPending ? 0.7 : 1 }}
+        >
+          {isPending ? (
+            <>
+              <Loader2 size={15} style={{ animation: "spin 0.7s linear infinite" }} />
+              投稿中...
+            </>
+          ) : (
+            <>
+              <Send size={15} />
+              投稿する
+            </>
+          )}
+        </button>
+      </div>
     </form>
   );
 }

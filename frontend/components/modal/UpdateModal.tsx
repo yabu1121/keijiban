@@ -3,7 +3,7 @@ import { getPost, updatePost } from "@/actions/postApi";
 import { usePostUpdateModalStore } from "@/store/useModalstore";
 import { CreatePostRequest } from "@/types/post";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, Edit3, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export const UpdateModal = () => {
@@ -23,7 +23,7 @@ export const UpdateModal = () => {
     }) => updatePost(targetId, targetPost),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      toast.success('更新完了')
+      toast.success('更新しました')
       closeModal()
     }
   })
@@ -34,16 +34,11 @@ export const UpdateModal = () => {
     e.preventDefault();
     const form = e.currentTarget
     const formData = new FormData(e.currentTarget);
-
     const req = {
       title: String(formData.get('title') ?? ""),
       content: String(formData.get('content') ?? ""),
     };
-
-    mutate({
-      targetId: modalId,
-      targetPost: req
-    }, {
+    mutate({ targetId: modalId, targetPost: req }, {
       onSuccess: () => form.reset()
     })
   };
@@ -55,34 +50,78 @@ export const UpdateModal = () => {
   }
 
   return (
-    <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200 z-50'>
-      <div className='relative bg-white rounded-2xl shadow-2xl p-8 w-80 animate-in fade-in zoom-in-95 duration-300'>
+    <div className="modal-overlay">
+      <div className="modal-box">
+        {/* 閉じるボタン */}
         <button
           onClick={handleClose}
-          className='absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400 hover:border-red-200 transition-all duration-150 cursor-pointer'
+          style={{
+            position: "absolute", top: "16px", right: "16px",
+            width: "32px", height: "32px",
+            background: "var(--bg-hover)", border: "1px solid var(--border)",
+            borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "var(--text-muted)", transition: "all 0.15s ease",
+          }}
         >
-          <X className='w-4 h-4' />
+          <X size={16} />
         </button>
+
+        {/* ヘッダー */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
+          <div style={{
+            width: "40px", height: "40px",
+            background: "var(--accent-muted)",
+            borderRadius: "10px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <Edit3 size={20} color="var(--accent)" />
+          </div>
+          <p style={{ fontSize: "18px", fontWeight: 700, color: "var(--text-primary)" }}>
+            投稿を編集
+          </p>
+        </div>
+
         {isPending ? (
-          <p className='text-gray-500 text-center py-8'>読み込み中...</p>
+          <div style={{ textAlign: "center", padding: "32px 0", color: "var(--text-muted)" }}>
+            <div className="spinner" style={{ margin: "0 auto 10px" }} />
+            <p style={{ fontSize: "13px" }}>読み込み中...</p>
+          </div>
         ) : (
-          <>
-            <div className='mb-6'>
-              <p className='text-lg font-bold text-gray-900 mb-2'>更新する内容を表示</p>
-              <form onSubmit={handleSubmit} id="edit-form" className="flex flex-col gap-2 mt-4">
-                <input defaultValue={post?.title} name="title" type="text" className="border p-1" placeholder="title" />
-                <input defaultValue={post?.content} name="content" type="text" className="border p-1" placeholder="content" />
-              </form>
+          <form onSubmit={handleSubmit} id="edit-form" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div className="form-group">
+              <label className="label" htmlFor="update-title">タイトル</label>
+              <input
+                id="update-title"
+                defaultValue={post?.title}
+                name="title"
+                type="text"
+                className="input"
+                placeholder="タイトルを入力..."
+              />
             </div>
-            <div className='flex gap-3'>
-              <button type="submit" form="edit-form" className='flex-1 h-11 rounded-xl border border-gray-200 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all duration-150 cursor-pointer'>
+            <div className="form-group">
+              <label className="label" htmlFor="update-content">本文</label>
+              <textarea
+                id="update-content"
+                defaultValue={post?.content}
+                name="content"
+                className="input"
+                placeholder="内容を入力..."
+                rows={4}
+                style={{ resize: "vertical", fontFamily: "inherit" }}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+              <button type="button" onClick={handleClose} className="btn-ghost" style={{ flex: 1, justifyContent: "center" }}>
+                キャンセル
+              </button>
+              <button type="submit" form="edit-form" className="btn-primary" style={{ flex: 1, justifyContent: "center" }}>
+                <Save size={15} />
                 更新する
               </button>
-              <button onClick={handleClose} className='flex-1 h-11 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-all duration-150 cursor-pointer shadow-lg shadow-red-200'>
-                閉じる
-              </button>
             </div>
-          </>
+          </form>
         )}
       </div>
     </div>
